@@ -1,0 +1,254 @@
+@import "tailwindcss";
+
+/* 启用基于类名的深色模式 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Echo 设计规范 - 浅色主题 */
+  --background: #FFFFFF;
+  --background-secondary: #F9FAFB;
+  --foreground: #111827;
+  --accent: #000000;
+  --border: #E5E7EB;
+  --muted: #6B7280;
+  /* 安全区域 */
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  /* 液态玻璃效果变量 */
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-bg-heavy: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  --glass-highlight: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%);
+}
+
+.dark {
+  /* Echo 设计规范 - 深色主题 */
+  --background: #0F0F0F;
+  --background-secondary: #1A1A1A;
+  --foreground: #F9FAFB;
+  --accent: #FFFFFF;
+  --border: #2D2D2D;
+  --muted: #9CA3AF;
+  /* 深色模式液态玻璃 */
+  --glass-bg: rgba(30, 30, 30, 0.72);
+  --glass-bg-heavy: rgba(30, 30, 30, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --glass-highlight: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
+}
+
+/* 基础样式 */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  /* 防止移动端滚动弹性效果 */
+  overscroll-behavior: none;
+  /* 安全区域适配 */
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* 噪点纹理背景 - 增加质感 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+.dark body::before,
+body:where(.dark *)::before {
+  opacity: 0.035;
+}
+
+/* ============================================
+   iOS 液态玻璃效果 (Liquid Glass)
+   ============================================ */
+
+/* 基础玻璃效果 */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  position: relative;
+}
+
+/* 玻璃高光效果 */
+.glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: var(--glass-highlight);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* 重度玻璃效果（更不透明） */
+.glass-heavy {
+  background: var(--glass-bg-heavy);
+  backdrop-filter: blur(24px) saturate(200%);
+  -webkit-backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* 玻璃按钮效果 */
+.glass-button {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.glass-button:hover {
+  background: var(--glass-bg-heavy);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.glass-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* 玻璃输入框 */
+.glass-input {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  border: 1px solid var(--glass-border);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  background: var(--glass-bg-heavy);
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05), inset 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.dark .glass-input:focus {
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05), inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* 玻璃卡片悬浮效果 */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* 液态动画效果 */
+@keyframes liquidShimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.glass-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: liquidShimmer 3s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* ============================================ */
+
+/* 隐藏滚动条但保留功能 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 消息气泡动画 */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-anim {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* 选中文字样式 */
+::selection {
+  background-color: #000000;
+  color: #FFFFFF;
+}
+
+/* 移动端触摸优化 */
+@media (max-width: 768px) {
+  /* 增大可点击区域 */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* 输入框优化 */
+  input, textarea {
+    font-size: 16px; /* 防止 iOS 自动缩放 */
+  }
+}
