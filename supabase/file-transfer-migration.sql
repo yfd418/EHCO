@@ -46,10 +46,11 @@ ON storage.objects FOR INSERT
 TO authenticated
 WITH CHECK (bucket_id = 'chat-files');
 
--- 4. 设置 Storage 策略 - 允许公开读取
-CREATE POLICY "Allow public read"
+-- 4. 设置 Storage 策略 - 仅允许认证用户读取（安全优化）
+-- 注意：这确保只有登录用户才能访问聊天文件，防止未授权访问
+CREATE POLICY "Allow authenticated read"
 ON storage.objects FOR SELECT
-TO public
+TO authenticated
 USING (bucket_id = 'chat-files');
 
 -- 5. 设置 Storage 策略 - 允许用户删除自己上传的文件

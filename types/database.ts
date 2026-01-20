@@ -79,6 +79,10 @@ export interface Database {
           content: string
           is_read: boolean
           created_at: string
+          message_type?: string
+          file_url?: string | null
+          file_name?: string | null
+          file_size?: number | null
         }
         Insert: {
           id?: string
@@ -87,6 +91,10 @@ export interface Database {
           content: string
           is_read?: boolean
           created_at?: string
+          message_type?: string
+          file_url?: string | null
+          file_name?: string | null
+          file_size?: number | null
         }
         Update: {
           id?: string
@@ -95,6 +103,10 @@ export interface Database {
           content?: string
           is_read?: boolean
           created_at?: string
+          message_type?: string
+          file_url?: string | null
+          file_name?: string | null
+          file_size?: number | null
         }
         Relationships: [
           {
@@ -106,6 +118,138 @@ export interface Database {
           {
             foreignKeyName: "messages_receiver_id_fkey"
             columns: ["receiver_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      channels: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          avatar_url: string | null
+          owner_id: string
+          is_private: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          avatar_url?: string | null
+          owner_id: string
+          is_private?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          avatar_url?: string | null
+          owner_id?: string
+          is_private?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channels_owner_id_fkey"
+            columns: ["owner_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      channel_members: {
+        Row: {
+          id: string
+          channel_id: string
+          user_id: string
+          role: 'owner' | 'admin' | 'member'
+          nickname: string | null
+          joined_at: string
+          last_read_at: string | null
+        }
+        Insert: {
+          id?: string
+          channel_id: string
+          user_id: string
+          role?: 'owner' | 'admin' | 'member'
+          nickname?: string | null
+          joined_at?: string
+          last_read_at?: string | null
+        }
+        Update: {
+          id?: string
+          channel_id?: string
+          user_id?: string
+          role?: 'owner' | 'admin' | 'member'
+          nickname?: string | null
+          joined_at?: string
+          last_read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_members_channel_id_fkey"
+            columns: ["channel_id"]
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_members_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      channel_messages: {
+        Row: {
+          id: string
+          channel_id: string
+          sender_id: string
+          content: string
+          message_type: string
+          file_url: string | null
+          file_name: string | null
+          file_size: number | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          channel_id: string
+          sender_id: string
+          content: string
+          message_type?: string
+          file_url?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          channel_id?: string
+          sender_id?: string
+          content?: string
+          message_type?: string
+          file_url?: string | null
+          file_name?: string | null
+          file_size?: number | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "channel_messages_channel_id_fkey"
+            columns: ["channel_id"]
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "channel_messages_sender_id_fkey"
+            columns: ["sender_id"]
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           }

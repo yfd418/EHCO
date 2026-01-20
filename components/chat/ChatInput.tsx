@@ -135,10 +135,10 @@ export default function ChatInput({
   }
 
   return (
-    <div className="absolute bottom-0 left-0 w-full p-4 md:p-6">
+    <div className="w-full px-4 py-4 md:px-6 md:py-6">
       {/* 文件预览 */}
       {filePreview && (
-        <div className="mb-3 p-3 bg-white dark:bg-[#1A1A1A] rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+        <div className="mb-4 p-4 bg-white dark:bg-[#1A1A1A] rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="flex items-center gap-3">
             {/* 预览图或图标 */}
             {filePreview.preview ? (
@@ -211,7 +211,7 @@ export default function ChatInput({
         <button 
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled || uploading}
-          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-400 transition-colors disabled:opacity-50"
+          className="flex-shrink-0 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full text-gray-400 transition-colors disabled:opacity-50"
           title="发送文件"
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -228,14 +228,14 @@ export default function ChatInput({
           onKeyDown={handleKeyDown}
           placeholder="输入消息..."
           disabled={disabled || uploading}
-          className="flex-1 bg-transparent px-4 focus:outline-none text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 h-full disabled:opacity-50"
+          className="flex-1 min-w-0 bg-transparent px-3 focus:outline-none text-sm text-gray-800 dark:text-gray-100 placeholder-gray-400 disabled:opacity-50"
         />
 
         {/* 发送按钮 */}
         <button
           onClick={handleSend}
           disabled={!hasContent || disabled || uploading}
-          className={`p-2 rounded-full transition-all ${
+          className={`flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-full transition-all ${
             hasContent && !disabled && !uploading
               ? 'bg-black dark:bg-white text-white dark:text-black shadow-md hover:bg-gray-800 dark:hover:bg-gray-200'
               : 'bg-gray-100 dark:bg-gray-700 text-gray-400'

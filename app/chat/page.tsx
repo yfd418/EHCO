@@ -10,6 +10,23 @@ export default function ChatPage() {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [mobileMenuOpen, setMobileMenuOpen] = useState(true) // 默认打开侧边栏
 
+  // 尝试从缓存恢复数据
+  useEffect(() => {
+    try {
+      const cachedUser = sessionStorage.getItem('echo-current-user')
+      const cachedConvs = sessionStorage.getItem('echo-conversations')
+      
+      if (cachedUser) {
+        setCurrentUser(JSON.parse(cachedUser))
+      }
+      if (cachedConvs) {
+        setConversations(JSON.parse(cachedConvs))
+      }
+    } catch (e) {
+      // 忽略缓存读取错误
+    }
+  }, [])
+
   useEffect(() => {
     const fetchData = async () => {
       const { data: { session } } = await supabase.auth.getSession()
@@ -24,6 +41,9 @@ export default function ChatPage() {
 
       if (profile) {
         setCurrentUser(profile)
+        try {
+          sessionStorage.setItem('echo-current-user', JSON.stringify(profile))
+        } catch (e) { /* 忽略 */ }
       }
 
       // 获取好友列表（已接受的好友关系）
@@ -44,6 +64,9 @@ export default function ChatPage() {
           unread_count: 0,
         }))
         setConversations(convs)
+        try {
+          sessionStorage.setItem('echo-conversations', JSON.stringify(convs))
+        } catch (e) { /* 忽略 */ }
       }
     }
 

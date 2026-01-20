@@ -91,11 +91,15 @@ export default function MessageBubble({
     )
   }
 
-  // 渲染图片消息
+  // 渲染图片消息 - 优化版本，带宽高比占位符防止布局抖动
   const renderImageMessage = () => (
-    <div className="relative">
+    <div className="relative" style={{ minWidth: '200px', minHeight: '150px' }}>
+      {/* 骨架屏占位符 - 保持稳定的宽高比 */}
       {!imageLoaded && !imageError && (
-        <div className="w-48 h-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse flex items-center justify-center">
+        <div 
+          className="w-48 h-48 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse flex items-center justify-center"
+          style={{ aspectRatio: '4/3' }}
+        >
           <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <rect x="3" y="3" width="18" height="18" rx="2" ry="2" strokeWidth="2"></rect>
             <circle cx="8.5" cy="8.5" r="1.5" strokeWidth="2"></circle>
@@ -114,12 +118,16 @@ export default function MessageBubble({
         </div>
       ) : (
         <a href={message.file_url!} target="_blank" rel="noopener noreferrer">
+          {/* 使用 loading=lazy 和 decoding=async 优化加载性能 */}
           <img
             src={message.file_url!}
             alt={message.file_name || '图片'}
-            className={`max-w-full md:max-w-[320px] max-h-[320px] rounded-lg cursor-pointer hover:opacity-90 transition-opacity ${
-              imageLoaded ? '' : 'hidden'
+            loading="lazy"
+            decoding="async"
+            className={`max-w-full md:max-w-[320px] max-h-[320px] rounded-lg cursor-pointer hover:opacity-90 transition-opacity object-contain ${
+              imageLoaded ? 'opacity-100' : 'opacity-0 absolute inset-0'
             }`}
+            style={{ aspectRatio: 'auto' }}
             onLoad={() => setImageLoaded(true)}
             onError={() => setImageError(true)}
           />
@@ -222,7 +230,7 @@ export default function MessageBubble({
 
   return (
     <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} message-anim`}>
-      <div className={`flex ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 max-w-[85%] sm:max-w-[75%] md:max-w-[65%] lg:max-w-[50%]`}>
+      <div className={`flex ${isOwn ? 'flex-row-reverse' : 'flex-row'} items-end gap-2 max-w-[80%] sm:max-w-[70%] md:max-w-[60%] lg:max-w-[50%]`}>
         {/* 头像 - 只显示对方的 */}
         {!isOwn && (
           <div className={`flex-shrink-0 ${showAvatar ? 'visible' : 'invisible'}`}>
@@ -241,7 +249,7 @@ export default function MessageBubble({
             isOwn
               ? 'bg-black dark:bg-white text-white dark:text-black rounded-2xl rounded-br-none shadow-lg shadow-black/5'
               : 'bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-2xl rounded-bl-none'
-          } ${hasFile && (isImage || isVideo) ? 'p-2' : hasFile ? 'p-2' : 'px-4 py-2.5 md:px-5 md:py-3'}`}
+          } ${hasFile && (isImage || isVideo) ? 'p-2' : hasFile ? 'p-2' : 'px-4 py-3'}`}
         >
           {/* 文件内容 */}
           {hasFile && (

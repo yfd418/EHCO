@@ -21,9 +21,22 @@ export default function ChatRoomPage() {
   const [friend, setFriend] = useState<Profile | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [conversations, setConversations] = useState<Conversation[]>([])
-  const [loading, setLoading] = useState(true)
+  // 只在首次进入页面时显示 loading，切换聊天时不重置 loading
+  const [loading, setLoading] = useState(() => {
+    // 如果有缓存，直接不 loading
+    try {
+      const cachedUser = sessionStorage.getItem('echo-current-user')
+      const cachedConvs = sessionStorage.getItem('echo-conversations')
+      return !(cachedUser && cachedConvs)
+    } catch {
+      return true
+    }
+  })
   const [uploading, setUploading] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  
+  // 首次加载标记 - 用于区分切换聊天和初次进入
+  const [initialDataLoaded, setInitialDataLoaded] = useState(false)
   
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -85,8 +98,35 @@ export default function ChatRoomPage() {
       if (!isUserScrollingRef.current) {
         setTimeout(scrollToBottom, 50)
       }
+            {/* 侧边栏按钮，移动端显示 */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden p-2 -ml-2 mr-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-300"
+              aria-label="打开侧边栏"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+              </svg>
+            </button>
     }
   }, [messages, scrollToBottom])
+
+  // 尝试从缓存恢复数据，实现更快的页面切换
+  useEffect(() => {
+    try {
+      const cachedUser = sessionStorage.getItem('echo-current-user')
+      const cachedConvs = sessionStorage.getItem('echo-conversations')
+      if (cachedUser) setCurrentUser(JSON.parse(cachedUser))
+      if (cachedConvs) setConversations(JSON.parse(cachedConvs))
+      setInitialDataLoaded(true)
+      setLoading(false)
+    } catch (e) {
+      // 忽略缓存读取错误
+      setLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
     let channel: ReturnType<typeof supabase.channel> | null = null
@@ -120,6 +160,10 @@ export default function ChatRoomPage() {
 
       if (profile) {
         setCurrentUser(profile)
+        // 缓存用户信息
+        try {
+          sessionStorage.setItem('echo-current-user', JSON.stringify(profile))
+        } catch (e) { /* 忽略 */ }
       }
 
       // 获取好友档案
@@ -181,6 +225,10 @@ export default function ChatRoomPage() {
         })
         
         setConversations(convsWithDetails)
+        // 缓存好友列表
+        try {
+          sessionStorage.setItem('echo-conversations', JSON.stringify(convsWithDetails))
+        } catch (e) { /* 忽略 */ }
       }
 
       // 获取历史消息
@@ -201,7 +249,7 @@ export default function ChatRoomPage() {
             return { ...msg, is_read: true }
           }
           return msg
-        })
+        }) as Message[]
         setMessages(updatedMessages)
       }
 
@@ -441,7 +489,7 @@ export default function ChatRoomPage() {
     } else if (data) {
       // 用真实消息替换临时消息
       setMessages((prev) => 
-        prev.map((m) => (m.id === tempMessage.id ? data : m))
+        prev.map((m) => (m.id === tempMessage.id ? data as Message : m))
       )
     }
   }
@@ -504,14 +552,16 @@ export default function ChatRoomPage() {
     } else if (data) {
       // 用真实消息替换临时消息
       setMessages((prev) => 
-        prev.map((m) => (m.id === tempMessage.id ? data : m))
+        prev.map((m) => (m.id === tempMessage.id ? data as Message : m))
       )
     }
 
     setUploading(false)
   }
 
-  if (loading) {
+  // 只有在没有缓存数据时才显示加载状态
+  if (loading && !initialDataLoaded) {
+    // 只在首次进入页面时显示 loading，切换聊天时直接渲染缓存内容
     return (
       <>
         <ChatList 
@@ -550,14 +600,16 @@ export default function ChatRoomPage() {
         {/* 聊天头部 - 液态玻璃效果 */}
         <div className="h-14 md:h-16 flex items-center justify-between px-3 md:px-6 z-10 glass-heavy border-b-0">
           <div className="flex items-center">
-            {/* 移动端返回按钮 */}
-            <button 
-              onClick={() => router.push('/chat')}
-              className="md:hidden p-2 -ml-1 mr-1 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-300"
-              title="返回"
+            {/* 侧边栏按钮，移动端显示 */}
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="md:hidden p-2 -ml-2 mr-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-full text-gray-600 dark:text-gray-300"
+              aria-label="打开侧边栏"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M15 18l-6-6 6-6"></path>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
               </svg>
             </button>
             {/* 在线状态指示器 */}
@@ -584,14 +636,14 @@ export default function ChatRoomPage() {
           </button>
         </div>
 
-        {/* 消息列表 */}
+        {/* 消息列表 - 增加留白让对话成为焦点 */}
         <div 
           ref={messagesContainerRef}
           onScroll={handleScroll}
-          className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 no-scrollbar pb-32 md:pb-36"
+          className="flex-1 overflow-y-auto px-4 py-6 md:px-8 md:py-8 space-y-3 no-scrollbar pb-32 md:pb-36"
         >
           {messages.length === 0 ? (
-            <div className="text-center py-12 md:py-20">
+            <div className="text-center py-16 md:py-24">
               <img 
                 src={friend?.avatar_url || getAvatarUrl(friend?.username || 'user')} 
                 className="w-16 h-16 md:w-20 md:h-20 rounded-full mx-auto mb-4 bg-gray-100 dark:bg-gray-800"
