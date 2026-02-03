@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo - Editorial Style Demo</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        paper: '#F2F0E9',      /* 暖米色纸张 */
+                        ink: '#1A1A1A',        /* 炭黑墨水 */
+                        accent: '#D93025',     /* 杂志红 */
+                        line: 'rgba(26, 26, 26, 0.15)'
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        mono: ['"Space Mono"', 'monospace'],
+                        sans: ['system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* 隐藏滚动条但保留功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* 模拟纸张纹理 */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 50;
+            mix-blend-mode: multiply;
+        }
+    </style>
+</head>
+<body class="bg-paper text-ink font-serif antialiased h-screen overflow-hidden flex flex-col md:flex-row selection:bg-accent selection:text-white">
+
+    <aside class="w-full md:w-80 border-r border-ink flex flex-col z-10 bg-paper">
+        <div class="p-6 border-b-4 border-ink">
+            <h1 class="text-5xl font-bold tracking-tighter italic">Echo.</h1>
+            <p class="font-mono text-xs mt-2 text-ink/60 uppercase tracking-widest">Issue No. 24 — Conversationalist</p>
+        </div>
+
+        <div class="flex-1 overflow-y-auto no-scrollbar">
+            <div class="group cursor-pointer bg-ink text-paper border-b border-ink transition-all">
+                <div class="p-5">
+                    <div class="flex justify-between items-baseline mb-1">
+                        <span class="font-mono text-xs opacity-60">01</span>
+                        <span class="font-mono text-xs text-accent">● LIVE</span>
+                    </div>
+                    <h3 class="text-3xl mb-2">Lin Yuhang</h3>
+                    <p class="font-sans text-sm opacity-80 line-clamp-1 italic">"那本书的排版确实很有意思..."</p>
+                </div>
+            </div>
+
+            <div class="group cursor-pointer border-b border-line hover:bg-ink/5 transition-all">
+                <div class="p-5">
+                    <div class="flex justify-between items-baseline mb-1">
+                        <span class="font-mono text-xs text-ink/40">02</span>
+                        <span class="font-mono text-xs text-ink/40">14:20</span>
+                    </div>
+                    <h3 class="text-2xl mb-2 group-hover:translate-x-2 transition-transform duration-300">Design Team</h3>
+                    <p class="font-sans text-sm text-ink/60 line-clamp-1">下周一的选题会推迟到...</p>
+                </div>
+            </div>
+
+            <div class="group cursor-pointer border-b border-line hover:bg-ink/5 transition-all">
+                <div class="p-5">
+                    <div class="flex justify-between items-baseline mb-1">
+                        <span class="font-mono text-xs text-ink/40">03</span>
+                        <span class="font-mono text-xs text-accent font-bold">NEW (2)</span>
+                    </div>
+                    <h3 class="text-2xl mb-2 group-hover:translate-x-2 transition-transform duration-300">Sarah Jenkins</h3>
+                    <p class="font-sans text-sm text-ink/60 line-clamp-1">[图片] 这里的咖啡不错</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-ink flex justify-between items-center font-mono text-xs uppercase">
+            <span>Logged in as: You</span>
+            <span class="w-2 h-2 bg-accent rounded-full animate-pulse"></span>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col relative z-0 bg-paper">
+        <header class="h-16 flex items-center justify-between px-8 border-b border-line">
+            <div class="flex items-center gap-4">
+                <span class="font-mono text-xs text-ink/40 uppercase tracking-widest">Conversation with</span>
+                <span class="text-xl font-bold">Lin Yuhang</span>
+            </div>
+            <div class="flex gap-4">
+                <button class="w-8 h-8 flex items-center justify-center border border-ink/20 hover:bg-ink hover:text-paper rounded-full transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </button>
+                <button class="w-8 h-8 flex items-center justify-center border border-ink/20 hover:bg-ink hover:text-paper rounded-full transition-colors">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"></path></svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto px-8 md:px-16 py-8 space-y-10 no-scrollbar">
+            
+            <div class="flex items-center justify-center">
+                <span class="px-4 py-1 border border-ink/20 font-mono text-[10px] uppercase tracking-widest text-ink/60">October 24, 2023</span>
+            </div>
+
+            <div class="flex flex-col items-start max-w-3xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="font-mono text-xs font-bold uppercase tracking-widest text-accent">Lin Yuhang</span>
+                    <span class="w-12 h-[1px] bg-ink/20"></span>
+                </div>
+                <div class="pl-6 border-l-2 border-ink/20">
+                    <p class="text-xl leading-relaxed">
+                        我刚看完那篇关于瑞士排版的文章。非常有启发性。我想我们可以在新项目中尝试一下那种网格系统。
+                    </p>
+                </div>
+                <span class="text-[10px] font-mono text-ink/40 mt-2 pl-6">09:41 AM</span>
+            </div>
+
+            <div class="flex flex-col items-end self-end max-w-3xl ml-auto">
+                <div class="pr-6 border-r-2 border-ink text-right">
+                    <p class="text-xl leading-relaxed">
+                        完全同意。那种留白的处理方式很高级。我其实做了一个简单的 Demo，你看看感觉如何？
+                    </p>
+                    <div class="mt-4 mb-2">
+                        <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=2000&auto=format&fit=crop" class="w-64 h-48 object-cover border border-ink filter grayscale hover:grayscale-0 transition-all duration-500" alt="Design Demo">
+                        <p class="text-xs font-mono text-ink/60 mt-1 italic text-left">figma_draft_v2.png</p>
+                    </div>
+                </div>
+                <span class="text-[10px] font-mono text-ink/40 mt-2 pr-6">09:45 AM • READ</span>
+            </div>
+
+            <div class="flex flex-col items-start max-w-3xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="font-mono text-xs font-bold uppercase tracking-widest text-accent">Lin Yuhang</span>
+                    <span class="w-12 h-[1px] bg-ink/20"></span>
+                </div>
+                <div class="pl-6 border-l-2 border-ink/20">
+                    <p class="text-xl leading-relaxed">
+                        这正是我想象中的样子！特别是那个衬线体的标题，很有力量感。
+                    </p>
+                    <p class="text-xl leading-relaxed mt-4">
+                        我们要不要把所有的圆角都去掉？让它看起来更锋利一点。
+                    </p>
+                </div>
+                <span class="text-[10px] font-mono text-ink/40 mt-2 pl-6">09:48 AM</span>
+            </div>
+
+        </div>
+
+        <div class="p-8 md:px-16 bg-paper relative">
+            <div class="absolute top-0 left-8 right-8 h-[1px] bg-ink/10"></div>
+            
+            <div class="flex items-end gap-6 pt-2">
+                <button class="pb-3 text-xs font-mono uppercase tracking-widest text-ink/40 hover:text-accent transition-colors group flex items-center gap-1">
+                    <span>[+]</span> <span>Attach</span>
+                </button>
+
+                <div class="flex-1">
+                    <textarea 
+                        rows="1" 
+                        placeholder="Type a message..." 
+                        class="w-full bg-transparent border-b border-ink/20 focus:border-ink py-2 text-xl font-serif placeholder:text-ink/20 placeholder:italic focus:outline-none resize-none transition-colors"
+                    ></textarea>
+                </div>
+
+                <button class="pb-3 text-xs font-mono uppercase tracking-widest text-ink font-bold hover:text-accent transition-colors">
+                    Send &rarr;
+                </button>
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>

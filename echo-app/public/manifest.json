@@ -1,0 +1,16 @@
+{
+  "name": "Echo",
+  "short_name": "Echo",
+  "description": "极简即时通讯，回归纯粹沟通",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

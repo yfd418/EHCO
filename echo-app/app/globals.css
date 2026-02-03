@@ -1,0 +1,399 @@
+@import "tailwindcss";
+
+/* 启用基于类名的深色模式 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Echo 杂志风格设计规范 - 浅色主题（暖调纸张） */
+  --background: #F2F0E9;
+  --background-secondary: #EBE9E2;
+  --foreground: #1A1A1A;
+  --accent: #D93025;
+  --border: #1A1A1A;
+  --muted: #6B7280;
+  --line: rgba(26, 26, 26, 0.15);
+  
+  /* 安全区域 */
+  --safe-area-inset-top: env(safe-area-inset-top);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom);
+  
+  /* 杂志色板 */
+  --color-paper: #F2F0E9;
+  --color-ink: #1A1A1A;
+  --color-accent: #D93025;
+}
+
+.dark {
+  /* Echo 杂志风格 - 深色主题（暗房风格） */
+  --background: #121212;
+  --background-secondary: #1A1A1A;
+  --foreground: #E0E0E0;
+  --accent: #FF4D4D;
+  --border: #E0E0E0;
+  --muted: #9CA3AF;
+  --line: rgba(255, 255, 255, 0.15);
+  
+  /* 深色杂志色板 */
+  --color-paper: #121212;
+  --color-ink: #E0E0E0;
+  --color-accent: #FF4D4D;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-playfair);
+  --font-mono: var(--font-mono);
+  
+  /* 杂志色板 */
+  --color-paper: var(--color-paper);
+  --color-ink: var(--color-ink);
+  --color-accent: var(--color-accent);
+  --color-line: var(--line);
+}
+
+/* 基础样式 */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-playfair), Georgia, serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  overscroll-behavior: none;
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+/* 纸张噪点纹理 - 增加粗糙感 */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 50;
+  mix-blend-mode: multiply;
+}
+
+.dark body::before {
+  opacity: 0.05;
+  mix-blend-mode: overlay;
+}
+
+/* ============================================
+   杂志风格组件
+   ============================================ */
+
+/* 杂志排版类 - 衬线体标题 */
+.font-editorial {
+  font-family: var(--font-playfair), Georgia, serif;
+  letter-spacing: -0.02em;
+}
+
+/* 打印机/档案风格 - 等宽字体 */
+.font-archive {
+  font-family: var(--font-mono), 'Courier New', monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 10px;
+}
+
+/* 强制直角，去除圆润感 */
+.sharp {
+  border-radius: 0px !important;
+}
+
+/* 墨水线条分割 */
+.ink-line {
+  border-color: var(--line);
+}
+
+/* 纸张背景 */
+.paper-bg {
+  background: var(--background);
+}
+
+/* 侧边栏样式 - 杂志风格 */
+.sidebar-editorial {
+  background: var(--background);
+  border-right: 1px solid var(--foreground);
+}
+
+/* 消息左侧边线（对方） */
+.message-line-left {
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--line);
+}
+
+/* 消息右侧边线（自己） */
+.message-line-right {
+  padding-right: 1.5rem;
+  border-right: 2px solid var(--foreground);
+}
+
+.dark .message-line-right {
+  border-right-color: var(--foreground);
+}
+
+/* ============================================ */
+
+/* 隐藏滚动条但保留功能 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 兼容旧的 glass 类（保留供渐进迁移） */
+.glass,
+.glass-heavy {
+  background: var(--background);
+  border: 1px solid var(--line);
+}
+
+.glass-button {
+  background: var(--background);
+  border: 1px solid var(--line);
+  transition: all 0.2s ease;
+}
+
+.glass-button:hover {
+  background: var(--foreground);
+  color: var(--background);
+}
+
+.glass-input {
+  background: transparent;
+  border-bottom: 1px solid var(--line);
+  transition: all 0.2s ease;
+}
+
+.glass-input:focus {
+  border-bottom-color: var(--foreground);
+}
+
+.glass-card {
+  background: var(--background);
+  border: 1px solid var(--line);
+}
+
+.glass-card:hover {
+  border-color: var(--foreground);
+}
+
+/* ============================================ */
+
+/* 隐藏滚动条但保留功能 */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* 消息气泡动画 */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.message-anim {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+/* 选中文字样式 - 杂志红色 */
+::selection {
+  background-color: var(--accent);
+  color: #FFFFFF;
+}
+
+.dark ::selection {
+  background-color: var(--accent);
+  color: #FFFFFF;
+}
+
+/* ============================================
+   iOS 安全区域适配
+   ============================================ */
+
+/* 底部安全区域 - 用于输入框等底部固定元素 */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* 顶部安全区域 - 用于刘海屏适配 */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+/* 聊天输入框专用安全区域 */
+.chat-input-container {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+}
+
+/* PWA 全屏模式下的额外适配 */
+@media (display-mode: standalone) {
+  .safe-area-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+  }
+  
+  .safe-area-top {
+    padding-top: max(env(safe-area-inset-top, 0px), 20px);
+  }
+}
+
+/* 支持 iOS Safari 15+ viewport-fit */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .chat-input-container {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  }
+}
+
+/* ============================================
+   移动端触摸优化
+   ============================================ */
+
+@media (max-width: 768px) {
+  /* 增大可点击区域 */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* 输入框优化 */
+  input, textarea {
+    font-size: 16px; /* 防止 iOS 自动缩放 */
+  }
+  
+  /* 优化触摸滚动 */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+  
+  /* 防止长按菜单 */
+  .no-context-menu {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+}
+
+/* ============================================
+   动画与过渡优化
+   ============================================ */
+
+/* 减少动画（用户偏好） */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* 硬件加速优化 */
+.gpu-accelerate {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ============================================
+   低特效模式 (Performance Mode)
+   使用不透明度代替实时模糊，提升低端设备性能
+   ============================================ */
+
+/* 低特效模式下的玻璃效果 - 用不透明度代替模糊 */
+.low-effects .glass,
+.low-effects .glass-heavy,
+.low-effects .glass-card,
+.low-effects .glass-button,
+.low-effects .glass-input {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.low-effects .glass {
+  background: rgba(255, 255, 255, 0.92) !important;
+}
+
+.low-effects .glass-heavy {
+  background: rgba(255, 255, 255, 0.96) !important;
+}
+
+.low-effects .glass-card {
+  background: rgba(255, 255, 255, 0.94) !important;
+}
+
+.low-effects.dark .glass,
+.low-effects .dark .glass {
+  background: rgba(20, 20, 20, 0.92) !important;
+}
+
+.low-effects.dark .glass-heavy,
+.low-effects .dark .glass-heavy {
+  background: rgba(20, 20, 20, 0.96) !important;
+}
+
+.low-effects.dark .glass-card,
+.low-effects .dark .glass-card {
+  background: rgba(20, 20, 20, 0.94) !important;
+}
+
+/* 低特效模式下禁用高光和流动效果 */
+.low-effects .glass::before,
+.low-effects .glass::after,
+.low-effects .glass-shimmer::after {
+  display: none !important;
+}
+
+/* 低特效模式下禁用噪点纹理 */
+.low-effects body::before {
+  display: none !important;
+}
+
+/* 低特效模式下减少动画 */
+.low-effects *,
+.low-effects *::before,
+.low-effects *::after {
+  transition-duration: 0.1s !important;
+}
+
+.low-effects .glass-card:hover {
+  transform: none !important;
+}
+
+/* Toast 动画 */
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out forwards;
+}
