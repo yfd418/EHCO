@@ -247,6 +247,7 @@ export default function ChannelPage() {
       file_name: null,
       file_size: null,
       file_type: null,
+      reply_to: null,
       created_at: new Date().toISOString(),
     }
 
@@ -307,6 +308,7 @@ export default function ChannelPage() {
       file_name: file.name,
       file_size: file.size,
       file_type: file.type,
+      reply_to: null,
       created_at: new Date().toISOString(),
     }
 
