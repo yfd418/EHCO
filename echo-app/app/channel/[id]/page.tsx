@@ -159,9 +159,9 @@ export default function ChannelPage() {
         .eq('channel_id', channelId)
         .eq('user_id', session.user.id)
 
-      // 监听新消息
+      // 监听新消息 - 使用唯一的频道名避免重复订阅问题
       messageChannel = supabase
-        .channel(`channel-messages-${channelId}`)
+        .channel(`channel-messages-${channelId}-${Date.now()}`)
         .on(
           'postgres_changes',
           {
@@ -171,20 +171,48 @@ export default function ChannelPage() {
             filter: `channel_id=eq.${channelId}`,
           },
           async (payload) => {
+            const newMsgPayload = payload.new as { id: string; sender_id: string }
+            
+            // 如果是自己发送的消息，乐观更新已经处理过了
+            // 检查是否已存在（防止重复）
+            setMessages((prev) => {
+              if (prev.some((m) => m.id === newMsgPayload.id)) {
+                return prev
+              }
+              // 不是自己的消息，需要获取完整信息
+              return prev
+            })
+            
             // 获取完整消息（包含发送者信息）
             const { data: newMsg } = await supabase
               .from('channel_messages')
               .select('*, sender:profiles!channel_messages_sender_id_fkey(*)')
-              .eq('id', payload.new.id)
+              .eq('id', newMsgPayload.id)
               .single()
 
             if (newMsg) {
               const msg = newMsg as ChannelMessage
               setMessages((prev) => {
-                // 防止重复
+                // 防止重复（可能乐观更新已经添加过）
                 if (prev.some((m) => m.id === msg.id)) return prev
+                // 检查是否有对应的临时消息需要替换
+                const tempIndex = prev.findIndex(
+                  (m) =>
+                    m.id.startsWith('temp_') &&
+                    m.sender_id === msg.sender_id &&
+                    m.content === msg.content &&
+                    m.message_type === msg.message_type
+                )
+                if (tempIndex >= 0) {
+                  // 替换临时消息
+                  const updated = [...prev]
+                  updated[tempIndex] = msg
+                  setMessagesCache(channelId, updated.filter((m) => !m.id.startsWith('temp_')))
+                  return updated
+                }
+                // 新消息来自其他用户
                 const updated = [...prev, msg]
-                setMessagesCache(channelId, updated)
+                setMessagesCache(channelId, updated.filter((m) => !m.id.startsWith('temp_')))
                 return updated
               })
             }
@@ -206,7 +234,26 @@ export default function ChannelPage() {
   const handleSendMessage = async (content: string) => {
     if (!currentUser || !channel) return
 
-    const { error } = await supabase
+    // 创建临时消息（乐观更新）
+    const tempId = `temp_${Date.now()}`
+    const tempMessage: ChannelMessage = {
+      id: tempId,
+      channel_id: channel.id,
+      sender_id: currentUser.id,
+      sender: currentUser,
+      content,
+      message_type: 'text',
+      file_url: null,
+      file_name: null,
+      file_size: null,
+      file_type: null,
+      created_at: new Date().toISOString(),
+    }
+
+    // 立即添加到消息列表（乐观更新）
+    setMessages((prev) => [...prev, tempMessage])
+
+    const { data, error } = await supabase
       .from('channel_messages')
       .insert({
         channel_id: channel.id,
@@ -214,9 +261,21 @@ export default function ChannelPage() {
         content,
         message_type: 'text',
       })
+      .select('*, sender:profiles!channel_messages_sender_id_fkey(*)')
+      .single()
 
     if (error) {
       console.error('发送失败:', error)
+      // 发送失败，移除临时消息
+      setMessages((prev) => prev.filter((m) => m.id !== tempId))
+    } else if (data) {
+      // 发送成功，替换临时消息为真实消息
+      const realMessage = data as ChannelMessage
+      setMessages((prev) => {
+        const updated = prev.map((m) => (m.id === tempId ? realMessage : m))
+        setMessagesCache(channelId, updated.filter((m) => !m.id.startsWith('temp_')))
+        return updated
+      })
     }
   }
 
@@ -235,7 +294,26 @@ export default function ChannelPage() {
 
     const messageType: MessageType = isImageFile(file.type) ? 'image' : 'file'
 
-    await supabase
+    // 创建临时消息（乐观更新）
+    const tempId = `temp_${Date.now()}`
+    const tempMessage: ChannelMessage = {
+      id: tempId,
+      channel_id: channel.id,
+      sender_id: currentUser.id,
+      sender: currentUser,
+      content: '',
+      message_type: messageType,
+      file_url: result.url,
+      file_name: file.name,
+      file_size: file.size,
+      file_type: file.type,
+      created_at: new Date().toISOString(),
+    }
+
+    // 立即添加到消息列表（乐观更新）
+    setMessages((prev) => [...prev, tempMessage])
+
+    const { data, error } = await supabase
       .from('channel_messages')
       .insert({
         channel_id: channel.id,
@@ -247,6 +325,22 @@ export default function ChannelPage() {
         file_size: file.size,
         file_type: file.type,
       })
+      .select('*, sender:profiles!channel_messages_sender_id_fkey(*)')
+      .single()
+
+    if (error) {
+      console.error('发送文件失败:', error)
+      // 发送失败，移除临时消息
+      setMessages((prev) => prev.filter((m) => m.id !== tempId))
+    } else if (data) {
+      // 发送成功，替换临时消息为真实消息
+      const realMessage = data as ChannelMessage
+      setMessages((prev) => {
+        const updated = prev.map((m) => (m.id === tempId ? realMessage : m))
+        setMessagesCache(channelId, updated.filter((m) => !m.id.startsWith('temp_')))
+        return updated
+      })
+    }
 
     setUploading(false)
   }
@@ -402,7 +496,7 @@ export default function ChannelPage() {
           </div>
         ) : (
           <Virtuoso
-            className="flex-1"
+            className="flex-1 overflow-x-hidden no-scrollbar"
             data={messages}
             initialTopMostItemIndex={Math.max(messages.length - 1, 0)}
             followOutput={isAtBottom ? 'auto' : false}

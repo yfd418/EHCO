@@ -607,20 +607,6 @@ export default function ChatRoomPage() {
               <span className="font-mono text-xs text-[#D93025] dark:text-[#FF4D4D]">● LIVE</span>
             )}
           </div>
-          <div className="flex gap-2">
-            <button className="w-8 h-8 flex items-center justify-center border border-black/20 dark:border-white/20 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </button>
-            <button className="w-8 h-8 flex items-center justify-center border border-black/20 dark:border-white/20 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <circle cx="12" cy="12" r="1"></circle>
-                <circle cx="12" cy="5" r="1"></circle>
-                <circle cx="12" cy="19" r="1"></circle>
-              </svg>
-            </button>
-          </div>
         </header>
 
         {/* 消息列表 - 杂志风格增加留白 */}
@@ -643,7 +629,7 @@ export default function ChatRoomPage() {
           </div>
         ) : (
           <Virtuoso
-            className="flex-1"
+            className="flex-1 overflow-x-hidden no-scrollbar"
             data={messages}
             initialTopMostItemIndex={Math.max(messages.length - 1, 0)}
             followOutput={isAtBottom ? 'auto' : false}
